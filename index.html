@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>言語道場</title>
+    <title>語彙語彙数</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -10,72 +10,93 @@
     <!--画面１：言語選択-->
     <div id="screen-language" class="screen">
         <div id="menu-container">
-            <h1>言語を選択</h1>
+            <h1>言語</h1>
 
-            <div id="quiz-list">
-                <div class="quiz-card" onclick="showScreen('screen-english-menu')">
-                    <span class="quiz-title">英語</span>
-                </div>
-
-                <div class="quiz-card disabled">
-                    <span class="quiz-title">スペイン語</span>
-                </div>
-            </div>
+            <div id="list-language" class= "quiz-list"></div>
         </div>
     </div>
 
-    <!--画面２：英語メニュー（難易度選択）-->
-    <div id="screen-english-menu" class="screen" style="display:none;">
+    <!-- 画面２：リスト選択 -->
+    <div id="screen-list" class="screen" style="display:none;">
         <div id="menu-container">
-            <a href="#" class="back-link" onclick="showScreen('screen-language'); return false;">言語選択へ戻る</a>
+            <div class="header-row">
+                <a href="#" class="back-link" onclick="renderLanguageMenu(); return false;">戻る</a>
+                <h1 id="list-title">リスト選択</h1>
+            </div>
+            <p id="list-subtitle">ここに説明</p>
+            <div id="list-lists" class="quiz-list"></div>
+        </div>
+    </div>
 
-            <h1>難易度</h1>
-
-            <div id="quiz-list">
-                <div class="quiz-card disabled">
-                    <span class="quiz-title">基礎単語</span>
+    <!--画面３：出題モード選択-->
+    <div id="screen-mode" class="screen" style="display:none;">
+        <div id="menu-container">
+            <div class="header-row">
+                <a href="#" class="back-link" onclick="showScreen('screen-list'); return false;">戻る</a>
+                <h1 id="mode-title">出題モード</h1>
+            </div>
+            <div class="quiz-list">
+                <div class="quiz-card" onclick="chooseRandomMode()">
+                    <span class="quiz-title">全体からランダム出題</span>
+                    <span class="quiz-desc">1000語からランダムに出題</span>
                 </div>
-
-                <div class="quiz-card disabled">
-                    <span class="quiz-title">初級単語</span>
+                <div class="quiz-card" onclick="chooseRandomMode = 'random'; renderChunkMenu(); showScreen('screen-chunk')">
+                    <span class="quiz-title">範囲を選んでランダム</span>
+                    <span class="quiz-desc">100問区切りでランダム</span>
                 </div>
-
-                <div class="quiz-card" onclick="startQuiz()">
-                    <span class="quiz-title">中級単語</span>
-                </div>
-
-                <div class="quiz-card disabled">
-                    <span class="quiz-title">上級単語</span>
+                <div class="quiz-card" onclick="chunkSelectMode = 'sequential'; renderChunkMenu(); showScreen('screen-chunk')">
+                    <span class="quiz-title">100問ずつ</span>
                 </div>
             </div>
         </div>
     </div>
 
-    <!--画面３：クイズ本体-->
+    <!-- 画面４：100問の範囲選択 -->
+    <div id="screen-chunk" class="screen" style="display:none;">
+        <div id="menu-container">
+            <div class="header-row">
+                <a href="#" class="back-link" onclick="showScreen('screen-mode'); return false;">戻る</a>
+                <h1>範囲を選択</h1>
+            </div>
+            <div id="list-chunks" class="quiz-list"></div>
+        </div>
+    </div>
+
+    <!-- 画面５：クイズ本体 -->
     <div id="screen-quiz" class="screen" style="display:none;">
         <div id="menu-container">
-            <a href="#" class="back-link" onclick="showScreen('screen-english-menu'); return false;">難易度選択へ戻る</a>
-
+            <div class="header-row">
+                <a href="#" class="back-link" onclick="showScreen('screen-list'); return false;">戻る</a>
+            </div>
             <div id="quiz-container">
                 <div id="question-area">
                     <h2 id="question-text">問題文がここに入る</h2>
                     <button id="speak-btn">🔊</button>
                 </div>
-
                 <div id="choices">
                     <button class="choice-btn"><span class="choice-number">1</span><span class="choice-text"></span></button>
                     <button class="choice-btn"><span class="choice-number">2</span><span class="choice-text"></span></button>
                     <button class="choice-btn"><span class="choice-number">3</span><span class="choice-text"></span></button>
                 </div>
-
                 <p id="result-text"></p>
-
                 <button id="next-btn" class="disabled">次へ</button>
             </div>
         </div>
     </div>
 
-    <script src="wordlist.js"></script>
+    <!-- wordlistファイルを読み込む(contentより先) -->
+    <script src="EN-Lists/wordlist-en-list1.js"></script>
+    <script src="EN-Lists/wordlist-en-list2.js"></script>
+    <script src="EN-Lists/wordlist-en-list3.js"></script>
+    <script src="EN-Lists/wordlist-en-list4.js"></script>
+    <script src="EN-Lists/wordlist-en-list5.js"></script>
+    <script src="EN-Lists/wordlist-en-list6.js"></script>
+    <script src="EN-Lists/wordlist-en-list7.js"></script>
+    <script src="EN-Lists/wordlist-en-list8.js"></script>
+    <script src="EN-Lists/wordlist-en-list9.js"></script>
+    <script src="EN-Lists/wordlist-en-list10.js"></script>
+
+    <script src="content.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

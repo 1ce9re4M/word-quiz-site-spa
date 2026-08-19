@@ -21,37 +21,75 @@ body {
 #menu-container {
     text-align: center;
     color: #fff;
-    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 40px;
+    width: 500px;
 }
 
 #menu-container h1{
     font-size: 32px;
-    margin-bottom: 30px;
+    margin-bottom: 3px;
+}
+
+.header-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+    position: relative;
+    width: 100%;
+}
+
+#screen-quiz .header-row {
+    margin-bottom: 40px;
+}
+
+.header-row h1 {
+    margin: 0;
 }
 
 .back-link {
+    /* quiz-cardと同じ設定 */
     position: absolute;
-    top: -40px;
+    top: 50%;
     left: 0;
-    color: #fff;
+    transform: translateY(-50%);
+    background-color: #ffffff;
+    color: #333;
     text-decoration: none;
-    font-size: 14px;
-    opacity: 0.8;
+    font-size: 20px;
+    font-weight: bold;
+    padding: 12px 22px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease;
 }
 
 .back-link:hover {
-    opacity: 1;
+    /* quiz-cardと同じ */
+    transform: translateY(-50%) translateY(-2px);
 }
 
-#quiz-list {
+.quiz-list {
     display: flex;
     flex-direction: column;
     gap: 24px;
     width: 320px;
+    max-height: 70vh;
+    overflow-y: auto;   /* スクロール可能 */
+    padding: 8px;   /*上部の見切れを防ぐ*/
+    scrollbar-width: none;  /* Firefox用 */
+    -ms-overflowstyle: none;    /* 古いEdge/IE用*/
+}
+
+.quiz-list::-webkit-scrollbar {
+    display: none;  /* Chrome, Safari用 */
 }
 
 .quiz-card {
-    background: #fff;
+    background-color: #ffffff;
     color: #333;
     text-decoration: none;
     padding: 20px;
@@ -80,6 +118,17 @@ body {
 .quiz-title {
     font-size: 20px;
     font-weight: bold;
+}
+
+#list-subtitle {
+    font-size: 14px;
+    color: #fff;
+    opacity: 0.8;
+    margin-bottom: 24px;
+    line-height: 1.6;   /* 行間を広げる */
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .quiz-desc {
