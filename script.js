@@ -59,7 +59,7 @@ function renderListMenu(langKey) {
         card.innerHTML = `<span class="quiz-title">${list.title}</span>`;
         card.onclick = () => {
             currentWordList = list.wordList; // 選んだリストを覚えとく
-            cuurentListTitle = list.title;
+            currentListTitle = list.title;
             document.getElementById("mode-title").textContent = list.title; //画面３の見出しをここで更新
             showScreen("screen-mode");
         };
