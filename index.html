@@ -2,6 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width", initial-scale="1.0">
     <title>語彙語彙数</title>
     <link rel="stylesheet" href="style.css">
 
@@ -82,6 +83,17 @@
                 </div>
                 <p id="result-text"></p>
                 <button id="next-btn" class="disabled">次へ</button>
+            </div>
+
+            <!-- 終了画面 -->
+            <div id="quiz-complete" style="display:none;">
+                <div class="quiz-container">
+                    <h2>お疲れさまでした！</h2>
+                    <p id="complete-message"></p>
+                    <button class="quiz-card" onclick="showScreen('screen-mode')" style="margin-top: 16px;">
+                        <span class="quiz-title">出題モードに戻る</span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>

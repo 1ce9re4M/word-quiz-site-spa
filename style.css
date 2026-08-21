@@ -138,7 +138,7 @@ body {
 
 /*ここから下、クイズ画面用*/
 
-#quiz-container {
+#quiz-container, .quiz-container {
     background: #ffffff;
     padding: 40px;
     border-radius: 20px;
@@ -262,4 +262,41 @@ body {
 
 #next-btn.active:hover {
     background: #3a5ce0;
+}
+
+/* ==========================
+    スマホ用の調整(画面幅600px以下のとき)
+========================== */
+@media (max-width: 600px) {
+    #menu-container {
+        width: 100%;
+        padding: 20px 16px;
+    }
+
+    .quiz-list {
+        width: 100%;
+        max-width: 340px;
+    }
+
+    #quiz-container, .quiz-container {
+        width: 100%;
+        max-width: 340px;
+        padding: 24px;
+    }
+    #menu-container h1 {
+        font-size: 24px;
+    }
+
+    .quiz-title {
+        font-size: 18px;
+    }
+
+    #question-text {
+        font-size: 22px;
+    }
+
+    .back-link {
+        font-size: 16px;
+        padding: 10px 16px;
+    }
 }

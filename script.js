@@ -8,6 +8,7 @@ let chunkStart;         // 順番モードのとき、開始位置(0, 100, 200..
 let chunkEnd;           // 範囲の終わり
 let sequentialIndex;    // 順番モードで、今何問目か
 let chunkSelectMode;    // 範囲選択後に random か sequential か覚える
+let askedIndices;       //出題済みの単語のインデックスを覚える
 
 // ==========================
 // 画面切り替え
@@ -15,6 +16,10 @@ let chunkSelectMode;    // 範囲選択後に random か sequential か覚える
 function showScreen(screenId) {
     document.querySelectorAll(".screen").forEach(s => s.style.display = "none");
     document.getElementById(screenId).style.display = "flex";
+
+    //画面を切り替えるたびクイズの表示画面をリセット
+    document.getElementById("quiz-container").style.display = "block";
+    document.getElementById("quiz-complete").style.display = "none";
 }
 
 // ==========================
@@ -72,6 +77,7 @@ function renderListMenu(langKey) {
 // ==========================
 function chooseRandomMode() {
     currentMode = "random";
+    askedIndices = [];
     showScreen("screen-quiz");
     showQuestion();
 }
@@ -94,6 +100,7 @@ function renderChunkMenu() {
         card.onclick = () => {
             chunkStart = start;
             chunkEnd = end;
+            askedIndices = [];
 
             if (chunkSelectMode === "sequential") {
                 currentMode = "sequential";
@@ -119,8 +126,24 @@ document.getElementById("screen-chunk") // 要素取得は残すが、実際の�
 
 // ランダムモード用(今までと同じ)
 function pickRandomQuestion(){
-    const correctIndex = Math.floor(Math.random() * currentWordList.length);
+    // 出題済み以外を集める
+    const remainingIndices = [];
+    for (let i = 0; i < currentWordList.length; i++) {
+        if (!askedIndices.includes(i)) {
+            remainingIndices.push(i);
+        }
+    }
+
+    //候補がなくなれば終了
+    if (remainingIndices.length === 0) {
+        return null;
+    }
+
+    //残ったものの中からランダムに選ぶ
+    const pickIndexInRemaining = Math.floor(Math.random() * remainingIndices.length);
+    const correctIndex = remainingIndices[pickIndexInRemaining];
     const correctItem = currentWordList[correctIndex];
+    askedIndices.push(correctIndex);    //出題済みとして記録
 
     const wrongChoices = [];
     while (wrongChoices.length < 2) {
@@ -135,11 +158,24 @@ function pickRandomQuestion(){
 
 //範囲(chunkStart-End)の中からランダムに1問選ぶ
 function pickRandomChunkQuestion(){
-    const rangeSize = chunkEnd - chunkStart;
-    const correctOffset = Math.floor(Math.random() * rangeSize);
-    const correctIndex = chunkStart + correctOffset; //範囲内の絶対位置に変換
-    const correctItem = currentWordList[correctIndex];
+    //範囲内でまだ出してない番号だけ集める
+    const remainingIndices = [];
+    for (let i = chunkStart; i < chunkEnd; i++) {
+        if (!askedIndices.includes(i)) {
+            remainingIndices.push(i);
+        }
+    }
+    
+    if (remainingIndices.length === 0) {
+        return null; //範囲内を出し切った
+    }
 
+    const pickIndexInRemaining = Math.floor(Math.random() * remainingIndices.length);
+    const correctIndex = remainingIndices[pickIndexInRemaining];
+    const correctItem = currentWordList[correctIndex];
+    askedIndices.push(correctIndex);
+
+    const rangeSize = chunkEnd - chunkStart;
     const wrongChoices = [];
     while (wrongChoices.length < 2) {
         const randomOffset = Math.floor(Math.random() * rangeSize);
@@ -153,6 +189,10 @@ function pickRandomChunkQuestion(){
 
 // 順番モード用(1問ずつ順番に進める)
 function pickSequentialQuestion(){
+    if (sequentialIndex >= chunkEnd) {
+        return null;
+    }
+
     const correctItem = currentWordList[sequentialIndex];
     const correctIndex = sequentialIndex;
 
@@ -217,6 +257,12 @@ function showQuestion(){
         currentQuestion = pickSequentialQuestion();
     }
 
+    //出題する問題がなければ終了画面を表示
+    if (currentQuestion === null) {
+        finishQuiz();
+        return;
+    }
+
     document.getElementById("question-text").textContent = currentQuestion.word;
     speakWord(currentQuestion.word);
 
@@ -229,6 +275,16 @@ function showQuestion(){
     const nextBtn = document.getElementById("next-btn");
     nextBtn.classList.remove("active");
     nextBtn.classList.add("disabled");
+}
+
+//終了画面を表示
+function finishQuiz() {
+    document.getElementById("quiz-container").style.display = "none";
+    document.getElementById("quiz-complete").style.display = "block";
+
+    const total = askedIndices.length;
+    document.getElementById("complete-message").textContent =
+        `${total}問完了！` ;
 }
 
 const buttons = document.querySelectorAll(".choice-btn");
