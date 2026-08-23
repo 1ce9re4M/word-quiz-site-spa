@@ -264,6 +264,68 @@ body {
     background: #3a5ce0;
 }
 
+#quiz-complete h2 {
+    color: #333;
+    margin-top: 0;
+}
+
+#quiz-complete #complete-message {
+    color: #333;
+    font-size: 18px;
+    margin-bottom: 16px;
+}
+
+#quiz-complete .quiz-card {
+    display: inline-flex;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#wrong-answers-list {
+    max-height: 240px;      /* この高さを超えたらスクロール */
+    overflow-y: auto;
+    margin-bottom: 16px;
+    padding: 4px;
+    width: 100%;
+    scrollbar-width: none;      /* Firefox用、スクロールバーを隠す */
+    -ms-overflow-style: none;   /* 古いEdge/IE用 */
+}
+
+#wrong-answers-list::-webkit-scrollbar {
+    display: none;  /* Chrome, Safari用、スクロールバーを隠す */
+}
+
+.wrong-answer-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f9f9f9;
+    border: 2px solid #ddd;
+    border-radius: 12px;
+    padding: 14px 20px;
+    margin-bottom: 8px;
+    text-align: left;
+}
+
+.wrong-answers-heading {
+    color: #333;
+    font-size: 16px;
+    margin: 0 0 8px 0;
+    text-align: left;
+    width: 100%;
+}
+
+.wrong-word {
+    font-weight: bold;
+    color: #333;
+    font-size: 20px;
+}
+
+.wrong-meaning {
+    color: #777;
+    font-size: 14px;
+}
+
 /* ==========================
     スマホ用の調整(画面幅600px以下のとき)
 ========================== */

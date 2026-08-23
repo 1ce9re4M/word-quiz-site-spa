@@ -9,6 +9,8 @@ let chunkEnd;           // 範囲の終わり
 let sequentialIndex;    // 順番モードで、今何問目か
 let chunkSelectMode;    // 範囲選択後に random か sequential か覚える
 let askedIndices;       //出題済みの単語のインデックスを覚える
+let correctCount;       //正解数を覚える
+let wrongAnswers;       //間違えた問題を記録する
 
 // ==========================
 // 画面切り替え
@@ -78,6 +80,8 @@ function renderListMenu(langKey) {
 function chooseRandomMode() {
     currentMode = "random";
     askedIndices = [];
+    correctCount = 0;
+    wrongAnswers = [];
     showScreen("screen-quiz");
     showQuestion();
 }
@@ -101,6 +105,8 @@ function renderChunkMenu() {
             chunkStart = start;
             chunkEnd = end;
             askedIndices = [];
+            correctCount = 0;
+            wrongAnswers = [];
 
             if (chunkSelectMode === "sequential") {
                 currentMode = "sequential";
@@ -195,6 +201,7 @@ function pickSequentialQuestion(){
 
     const correctItem = currentWordList[sequentialIndex];
     const correctIndex = sequentialIndex;
+    askedIndices.push(correctIndex);
 
     const wrongChoices = [];
     while (wrongChoices.length < 2) {
@@ -284,18 +291,51 @@ function finishQuiz() {
 
     const total = askedIndices.length;
     document.getElementById("complete-message").textContent =
-        `${total}問完了！` ;
+        `正答率 ${correctCount}/${total}問` ;
+
+    //間違えた問題一覧
+    const wrongListContainer = document.getElementById("wrong-answers-list");
+    wrongListContainer.innerHTML = "";
+
+    if (wrongAnswers.length === 0) {
+        wrongListContainer.innerHTML = `<p style="color: #333;">全問正解です！</p>`;
+    } else {
+        const heading = document.createElement("h3");
+        heading.textContent = "間違えた単語";
+        heading.className = "wrong-answers-heading"
+        wrongListContainer.appendChild(heading);
+        wrongAnswers.forEach(item => {
+            const row = document.createElement("div");
+            row.className = "wrong-answer-item";
+            row.innerHTML = `
+                <span class="wrong-word">${item.word}</span>
+                <span class="wrong-meaning">${item.meaning}</span>
+            `;
+            wrongListContainer.appendChild(row);
+        })
+    }
 }
 
 const buttons = document.querySelectorAll(".choice-btn");
 
 buttons.forEach((btn, i) => {
     btn.addEventListener("click", () => {
+        //すでに答え終わっていたらそれ以上何もしない
+        if (document.getElementById("next-btn").classList.contains("active")) {
+            return;
+        }
+        
         if (i === currentQuestion.answer){
             btn.classList.add("correct");
+            correctCount++;
         } else {
             btn.classList.add("incorrect");
             buttons[currentQuestion.answer].classList.add("correct");
+            //間違えた単語と正解の意味を記録
+            wrongAnswers.push({
+                word: currentQuestion.word,
+                meaning: currentQuestion.choices[currentQuestion.answer]
+            });
         }
         const nextBtn = document.getElementById("next-btn");
         nextBtn.classList.remove("disabled");
