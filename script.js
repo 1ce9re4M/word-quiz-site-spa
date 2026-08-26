@@ -82,6 +82,9 @@ function chooseRandomMode() {
     askedIndices = [];
     correctCount = 0;
     wrongAnswers = [];
+
+    document.getElementById("quiz-info").textContent = curretListTitle;
+
     showScreen("screen-quiz");
     showQuestion();
 }
@@ -114,6 +117,9 @@ function renderChunkMenu() {
             } else {
                 currentMode = "randomChunk"; //範囲内ランダム
             }
+
+            document.getElementById("quiz-info").textContent =
+                `${currentListTitle} ${start + 1}~${end}問目`
 
             showScreen("screen-quiz");
             showQuestion();
@@ -350,6 +356,26 @@ document.getElementById("next-btn").addEventListener("click", () => {
 document.getElementById("speak-btn").addEventListener("click", () => {
     speakWord(currentQuestion.word);
 });
+
+function retryQuiz() {
+    askedIndices = [];
+    correctCount = 0;
+    wrongAnswers = [];
+
+    if (currentMode === "sequential") {
+        sequentialIndex = chunkStart; //順番モードのときは、範囲の先頭に戻す
+    }
+    
+    if (currentMode === "random") {
+        document.getElementById("quiz-info").textContent = currentListTitle;
+    } else {
+        document.getElementById("quiz-info").textContent = 
+            `${currentListTitle} ${chunkStart + 1}~${chunkEnd}問目`
+    }
+    showScreen("screen-quiz");
+    showQuestion();
+}
+
 
 // ==========================
 // 初期表示

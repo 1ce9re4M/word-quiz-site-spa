@@ -326,6 +326,14 @@ body {
     font-size: 14px;
 }
 
+#quiz-info {
+    color: #fff;
+    font-size: 16px;
+    font-weight: bold;
+    margin: 0 0 16px 0;
+    text-align: center;
+}
+
 /* ==========================
     スマホ用の調整(画面幅600px以下のとき)
 ========================== */

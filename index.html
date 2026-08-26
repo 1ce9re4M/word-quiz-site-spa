@@ -82,6 +82,9 @@
             <div class="header-row">
                 <a href="#" class="back-link" onclick="showScreen('screen-list'); return false;">戻る</a>
             </div>
+
+            <p id="quiz-info"></p>
+
             <div id="quiz-container">
                 <div id="question-area">
                     <h2 id="question-text">問題文がここに入る</h2>
@@ -104,8 +107,8 @@
 
                     <div id="wrong-answers-list"></div>
                     
-                    <button class="quiz-card" onclick="showScreen('screen-mode')" style="margin-top: 16px;">
-                        <span class="quiz-title">出題モードに戻る</span>
+                    <button class="quiz-card" onclick="retryQuiz()" style="margin-top: 16px;">
+                        <span class="quiz-title">もう一度</span>
                     </button>
                 </div>
             </div>
