@@ -42,11 +42,31 @@
         </div>
     </div>
 
+    <!-- 画面2.5：形式選択 -->
+    <div id="screen-format" class="screen" style="display:none;">
+        <div id="menu-container">
+            <div class="header-row">
+                <a href="#" class="back-link" onclick="showScreen('screen-list'); return false;">戻る</a>
+                <h1>形式を選択</h1>
+            </div>
+            <div class="quiz-list">
+                <div class="quiz-card" onclick="currentFormat = 'quiz'; showScreen('screen-mode')">
+                    <span class="quiz-title">3択クイズ</span>
+                    <span class="quiz-desc">選択肢から意味を選ぶ</span>
+                </div>
+                <div class="quiz-card" onclick="currentFormat = 'card'; showScreen('screen-mode')">
+                    <span class="quiz-title">単語帳</span>
+                    <span class="quiz-desc">スワイプで意味を確認</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!--画面３：出題モード選択-->
     <div id="screen-mode" class="screen" style="display:none;">
         <div id="menu-container">
             <div class="header-row">
-                <a href="#" class="back-link" onclick="showScreen('screen-list'); return false;">戻る</a>
+                <a href="#" class="back-link" onclick="showScreen('screen-mode'); return false;">戻る</a>
                 <h1 id="mode-title">出題モード</h1>
             </div>
             <div class="quiz-list">
@@ -107,6 +127,37 @@
 
                     <div id="wrong-answers-list"></div>
                     
+                    <button class="quiz-card" onclick="retryQuiz()" style="margin-top: 16px;">
+                        <span class="quiz-title">もう一度</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <!-- 画面６：単語帳 -->
+    <div id="screen-card" class="screen" style="display:none;">
+        <div id="menu-container">
+            <div class="header-row">
+                <a href="#" class="back-link" onclick="showScreen('screen-mode'); return false;">戻る</a>
+            </div>
+            <p id="card-info"></p>
+
+            <div id="card-area">
+                <div id="flashcard">
+                    <div id="card-word-row">
+                        <h2 id="card-word"></h2>
+                        <button id="card-speak">🔊</button>
+                    </div>
+                    <p id="card-meaning"></p>
+                    <p id="card-hint">← スワイプ →</p>
+                </div>
+                <p id="card-progress"></p>
+            </div>
+
+            <div id="card-complete" style="display:none;">
+                <div class="quiz-container">
+                    <h2>お疲れさまでした！</h2>
                     <button class="quiz-card" onclick="retryQuiz()" style="margin-top: 16px;">
                         <span class="quiz-title">もう一度</span>
                     </button>

@@ -11,6 +11,9 @@ let chunkSelectMode;    // 範囲選択後に random か sequential か覚える
 let askedIndices;       //出題済みの単語のインデックスを覚える
 let correctCount;       //正解数を覚える
 let wrongAnswers;       //間違えた問題を記録する
+let currentFormat = "quiz";  // "quiz" or "card"
+let currentCard;             // 単語帳で今表示中のカード
+let cardRevealed = false;    // 意味を表示済みか
 
 // ==========================
 // 画面切り替え
@@ -68,10 +71,22 @@ function renderListMenu(langKey) {
             currentWordList = list.wordList; // 選んだリストを覚えとく
             currentListTitle = list.title;
             document.getElementById("mode-title").textContent = list.title; //画面３の見出しをここで更新
-            showScreen("screen-mode");
+            showScreen("screen-format");
         };
         container.appendChild(card);
     });
+}
+
+function startSession() {
+    if (currentFormat === "card") {
+        document.getElementById("card-info").textContent =
+            document.getElementById("quiz-info").textContent;
+        showScreen("screen-card");
+        showCard();
+    } else {
+        showScreen("screen-quiz");
+        showQuestion();
+    }
 }
 
 // ==========================
@@ -83,10 +98,9 @@ function chooseRandomMode() {
     correctCount = 0;
     wrongAnswers = [];
 
-    document.getElementById("quiz-info").textContent = curretListTitle;
+    document.getElementById("quiz-info").textContent = currentListTitle;
 
-    showScreen("screen-quiz");
-    showQuestion();
+    startSession();
 }
 
 // ==========================
@@ -121,15 +135,14 @@ function renderChunkMenu() {
             document.getElementById("quiz-info").textContent =
                 `${currentListTitle} ${start + 1}~${end}問目`
 
-            showScreen("screen-quiz");
-            showQuestion();
+            startSession();
         };
         container.appendChild(card);
     }
 }
 
 // 画面3→画面4に移動するとき、ブロック一覧を作ってから表示する
-document.getElementById("screen-chunk") // 要素取得は残すが、実際の生成はshowScreen呼び出し前に必要
+// document.getElementById("screen-chunk") // 要素取得は残すが、実際の生成はshowScreen呼び出し前に必要
 // ↑ 画面3の「順番に出題」ボタンのonclickを少し変更する(下記参照)
 
 // ==========================
@@ -372,9 +385,118 @@ function retryQuiz() {
         document.getElementById("quiz-info").textContent = 
             `${currentListTitle} ${chunkStart + 1}~${chunkEnd}問目`
     }
-    showScreen("screen-quiz");
-    showQuestion();
+    startSession();
 }
+
+// ==========================
+// 単語帳モード
+// ==========================
+function showCard() {
+    document.getElementById("card-area").style.display = "block";
+    document.getElementById("card-complete").style.display = "none";
+
+    // 既存の出題ロジックを流用(正解の意味は choices[answer] で取れる)
+    let q;
+    if (currentMode === "random") q = pickRandomQuestion();
+    else if (currentMode === "randomChunk") q = pickRandomChunkQuestion();
+    else q = pickSequentialQuestion();
+
+    if (q === null) {
+        finishCards();
+        return;
+    }
+
+    currentCard = { word: q.word, meaning: q.choices[q.answer] };
+    cardRevealed = false;
+
+    document.getElementById("card-word").textContent = currentCard.word;
+    const meaningEl = document.getElementById("card-meaning");
+    meaningEl.textContent = currentCard.meaning;
+    meaningEl.style.visibility = "hidden";
+
+    const total = currentMode === "random"
+        ? currentWordList.length
+        : chunkEnd - chunkStart;
+    document.getElementById("card-progress").textContent =
+        `${askedIndices.length} / ${total}`;
+
+    speakWord(currentCard.word);
+}
+
+function finishCards() {
+    document.getElementById("card-area").style.display = "none";
+    document.getElementById("card-complete").style.display = "block";
+}
+
+// スワイプ後の処理：1回目は意味を表示、2回目は次の単語へ
+function onCardSwiped(dir) {
+    const card = document.getElementById("flashcard");
+    // 画面外へ飛ばす
+    card.style.transition = "transform 0.2s ease, opacity 0.2s ease";
+    card.style.transform = `translateX(${dir * 400}px) rotate(${dir * 20}deg)`;
+    card.style.opacity = "0";
+
+    setTimeout(() => {
+        // 一瞬で元の位置に戻す(アニメーションなし)
+        card.style.transition = "none";
+        card.style.transform = "";
+        card.style.opacity = "1";
+
+        if (!cardRevealed) {
+            cardRevealed = true;
+            document.getElementById("card-meaning").style.visibility = "visible";
+        } else {
+            showCard();
+        }
+    }, 200);
+}
+
+// ---- スワイプ検出(マウス・タッチ共通) ----
+(function setupSwipe() {
+    const card = document.getElementById("flashcard");
+    let startX = null;
+    let dragX = 0;
+
+    card.addEventListener("pointerdown", e => {
+        if (e.target.closest("button")) return;  // 🔊ボタンは除外
+        startX = e.clientX;
+        dragX = 0;
+        card.setPointerCapture(e.pointerId);
+        card.style.transition = "none";
+    });
+
+    card.addEventListener("pointermove", e => {
+        if (startX === null) return;
+        dragX = e.clientX - startX;
+        card.style.transform = `translateX(${dragX}px) rotate(${dragX / 20}deg)`;
+    });
+
+    function endDrag() {
+        if (startX === null) return;
+        startX = null;
+        if (Math.abs(dragX) > 60) {
+            onCardSwiped(dragX > 0 ? 1 : -1);
+        } else {
+            // スワイプが足りなければ元に戻す
+            card.style.transition = "transform 0.2s ease";
+            card.style.transform = "";
+        }
+    }
+    card.addEventListener("pointerup", endDrag);
+    card.addEventListener("pointercancel", endDrag);
+})();
+
+// PC用：矢印キーでも操作できるように
+document.addEventListener("keydown", e => {
+    if (document.getElementById("screen-card").style.display === "none") return;
+    if (document.getElementById("card-area").style.display === "none") return;
+    if (e.key === "ArrowRight") onCardSwiped(1);
+    if (e.key === "ArrowLeft") onCardSwiped(-1);
+});
+
+document.getElementById("card-speak").addEventListener("click", () => {
+    if (currentCard) speakWord(currentCard.word);
+});
 
 
 // ==========================

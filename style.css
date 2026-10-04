@@ -136,6 +136,89 @@ body {
     color: #777;
 }
 
+/* ==========================
+    単語帳モード
+========================== */
+#card-info {
+    color: #fff;
+    font-size: 16px;
+    font-weight: bold;
+    margin: 0 0 16px 0;
+}
+
+#flashcard {
+    background: #fff;
+    color: #333;
+    width: 340px;
+    min-height: 260px;
+    padding: 40px 24px;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    cursor: grab;
+    user-select: none;
+    touch-action: pan-y;   /* 縦スクロールは許可、横はスワイプ用に使う */
+}
+
+#flashcard:active {
+    cursor: grabbing;
+}
+
+#card-word-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+#card-word {
+    font-size: 32px;
+    margin: 0;
+}
+
+#card-speak {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 8px;
+}
+
+#card-speak:hover {
+    background: #eee;
+}
+
+#card-meaning {
+    font-size: 20px;
+    color: #555;
+    margin: 0;
+    min-height: 28px;   /* 非表示時もレイアウトが動かないように */
+}
+
+#card-hint {
+    font-size: 13px;
+    color: #aaa;
+    margin: 8px 0 0 0;
+}
+
+#card-progress {
+    color: #fff;
+    text-align: center;
+    margin-top: 20px;
+    font-weight: bold;
+}
+
+@media (max-width: 600px) {
+    #flashcard {
+        width: 100%;
+        max-width: 340px;
+    }
+}
+
 /*ここから下、クイズ画面用*/
 
 #quiz-container, .quiz-container {
