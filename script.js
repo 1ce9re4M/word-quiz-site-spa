@@ -498,6 +498,17 @@ document.getElementById("card-speak").addEventListener("click", () => {
     if (currentCard) speakWord(currentCard.word);
 });
 
+// クイズ・単語帳プレイ中の「戻る」ボタンが押されたときの処理
+function handleQuizBack() {
+    if (currentMode === "random") {
+        // 全体ランダムから来た場合はモード選択へ
+        showScreen('screen-mode');
+    } else {
+        // 範囲選択（ランダム・順番）から来た場合は範囲選択画面へ
+        showScreen('screen-chunk');
+    }
+}
+
 
 // ==========================
 // 初期表示

@@ -347,21 +347,115 @@ body {
     background: #3a5ce0;
 }
 
-#quiz-complete h2 {
+/* ==========================
+    終了画面のレイアウト
+========================== */
+.complete-box {
+    display: flex;
+    flex-direction: column;
+    padding: 28px 24px;
+    width: 400px; /* 少し横幅を広げると2列ボタンの文字が収まりやすい */
+}
+
+#quiz-complete h2, #card-complete h2 {
     color: #333;
-    margin-top: 0;
+    margin: 0 0 8px 0;
+    font-size: 24px;
 }
 
 #quiz-complete #complete-message {
-    color: #333;
-    font-size: 18px;
-    margin-bottom: 16px;
+    color: #555;
+    font-size: 16px;
+    font-weight: bold;
+    margin: 0 0 16px 0;
 }
 
-#quiz-complete .quiz-card {
-    display: inline-flex;
-    margin-left: auto;
-    margin-right: auto;
+/* 図の「1」：間違えた単語エリア（画面の約2/3を占めるよう高さを確保） */
+#wrong-answers-list {
+    height: 320px;           /* 高さをしっかり確保 */
+    overflow-y: auto;
+    margin-bottom: 20px;
+    padding: 8px;
+    background: #f4f5f7;     /* 薄いグレーの背景で枠をハッキリさせる */
+    border-radius: 14px;
+    width: 100%;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+#wrong-answers-list::-webkit-scrollbar {
+    display: none;
+}
+
+.wrong-answer-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    text-align: left;
+}
+
+.wrong-answers-heading {
+    color: #555;
+    font-size: 14px;
+    margin: 0 0 8px 4px;
+    text-align: left;
+    width: 100%;
+}
+
+.wrong-word {
+    font-weight: bold;
+    color: #333;
+    font-size: 18px;
+}
+
+.wrong-meaning {
+    color: #666;
+    font-size: 14px;
+}
+
+/* 図の「2, 3, 4, 5」：2×2のボタングリッド */
+.complete-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* 均等な幅で2列にする */
+    gap: 10px;                      /* ボタン同士の隙間 */
+    width: 100%;
+}
+
+.complete-btn {
+    background-color: #ffffff;
+    color: #333;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 14px 8px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.complete-btn:hover {
+    background-color: #f0f0f0;
+    transform: translateY(-2px);
+}
+
+/* 「もう一度」ボタンだけ少し目立たせる */
+.complete-btn.primary {
+    background-color: #6a5af9;
+    color: #ffffff;
+    border-color: #6a5af9;
+}
+
+.complete-btn.primary:hover {
+    background-color: #5848e5;
 }
 
 #wrong-answers-list {
