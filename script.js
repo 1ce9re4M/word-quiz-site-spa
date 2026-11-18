@@ -2,29 +2,66 @@
 // 状態を覚えとく変数
 // ==========================
 let currentWordList;    // 今使ってる1000語のリスト全体
-let currentListTitle;   //選んだリストの表示名
+let currentListTitle;   // 選んだリストの表示名
 let currentMode;        // "random" or "sequential"
 let chunkStart;         // 順番モードのとき、開始位置(0, 100, 200...)
 let chunkEnd;           // 範囲の終わり
 let sequentialIndex;    // 順番モードで、今何問目か
 let chunkSelectMode;    // 範囲選択後に random か sequential か覚える
-let askedIndices;       //出題済みの単語のインデックスを覚える
-let correctCount;       //正解数を覚える
-let wrongAnswers;       //間違えた問題を記録する
+let askedIndices;       // 出題済みの単語のインデックスを覚える
+let correctCount;       // 正解数を覚える
+let wrongAnswers;       // 間違えた問題を記録する
 let currentFormat = "quiz";  // "quiz" or "card"
 let currentCard;             // 単語帳で今表示中のカード
 let cardRevealed = false;    // 意味を表示済みか
+
+// 音声設定オブジェクト
+let appSettings = {
+    muted: false,
+    volume: 1.0,
+    rate: 1.0
+};
+
+// ==========================
+// 設定モーダルの制御
+// ==========================
+function openSettingsModal() {
+    const modal = document.getElementById("settings-modal");
+    if (modal) modal.style.display = "flex";
+}
+
+function closeSettingsModal() {
+    const modal = document.getElementById("settings-modal");
+    if (modal) modal.style.display = "none";
+}
+
+function updateSettings() {
+    const muteElem = document.getElementById("setting-mute");
+    const volElem = document.getElementById("setting-volume");
+    const rateElem = document.getElementById("setting-rate");
+
+    if (muteElem) appSettings.muted = muteElem.checked;
+    if (volElem) appSettings.volume = parseFloat(volElem.value);
+    if (rateElem) appSettings.rate = parseFloat(rateElem.value);
+
+    const volVal = document.getElementById("volume-val");
+    const rateVal = document.getElementById("rate-val");
+    if (volVal) volVal.textContent = appSettings.volume.toFixed(1);
+    if (rateVal) rateVal.textContent = appSettings.rate.toFixed(1);
+}
 
 // ==========================
 // 画面切り替え
 // ==========================
 function showScreen(screenId) {
     document.querySelectorAll(".screen").forEach(s => s.style.display = "none");
-    document.getElementById(screenId).style.display = "flex";
+    const target = document.getElementById(screenId);
+    if (target) target.style.display = "flex";
 
-    //画面を切り替えるたびクイズの表示画面をリセット
-    document.getElementById("quiz-container").style.display = "block";
-    document.getElementById("quiz-complete").style.display = "none";
+    const quizContainer = document.getElementById("quiz-container");
+    const quizComplete = document.getElementById("quiz-complete");
+    if (quizContainer) quizContainer.style.display = "block";
+    if (quizComplete) quizComplete.style.display = "none";
 }
 
 // ==========================
@@ -33,10 +70,10 @@ function showScreen(screenId) {
 function renderLanguageMenu() {
     showScreen("screen-language");
     const container = document.getElementById("list-language");
+    if (!container) return;
     container.innerHTML = "";
 
     for (const langKey in siteContent) {
-
         const lang = siteContent[langKey];
         const card = document.createElement("div");
         card.className = "quiz-card";
@@ -57,10 +94,16 @@ function renderLanguageMenu() {
 function renderListMenu(langKey) {
     showScreen("screen-list");
     const lang = siteContent[langKey];
-    document.getElementById("list-title").textContent = "レベルを選択";
-    document.getElementById("list-subtitle").textContent = "この単語リストは、言語学者Paul Nation氏が英語コーパス(BNC/COCA)をもとに作成した頻度別単語リストを、頻出度に応じて1000語ごとに区切ったものです。"
+    
+    const titleElem = document.getElementById("list-title");
+    const subtitleElem = document.getElementById("list-subtitle");
+    if (titleElem) titleElem.textContent = "レベルを選択";
+    if (subtitleElem) {
+        subtitleElem.textContent = "この単語リストは、言語学者Paul Nation氏が英語コーパス(BNC/COCA)をもとに作成した頻度別単語リストを、頻出度に応じて1000語ごとに区切ったものです。";
+    }
 
     const container = document.getElementById("list-lists");
+    if (!container) return;
     container.innerHTML = "";
 
     lang.lists.forEach(list => {
@@ -68,9 +111,10 @@ function renderListMenu(langKey) {
         card.className = "quiz-card";
         card.innerHTML = `<span class="quiz-title">${list.title}</span>`;
         card.onclick = () => {
-            currentWordList = list.wordList; // 選んだリストを覚えとく
+            currentWordList = list.wordList;
             currentListTitle = list.title;
-            document.getElementById("mode-title").textContent = list.title; //画面３の見出しをここで更新
+            const modeTitle = document.getElementById("mode-title");
+            if (modeTitle) modeTitle.textContent = list.title;
             showScreen("screen-format");
         };
         container.appendChild(card);
@@ -79,8 +123,9 @@ function renderListMenu(langKey) {
 
 function startSession() {
     if (currentFormat === "card") {
-        document.getElementById("card-info").textContent =
-            document.getElementById("quiz-info").textContent;
+        const cardInfo = document.getElementById("card-info");
+        const quizInfo = document.getElementById("quiz-info");
+        if (cardInfo && quizInfo) cardInfo.textContent = quizInfo.textContent;
         showScreen("screen-card");
         showCard();
     } else {
@@ -98,7 +143,8 @@ function chooseRandomMode() {
     correctCount = 0;
     wrongAnswers = [];
 
-    document.getElementById("quiz-info").textContent = currentListTitle;
+    const quizInfo = document.getElementById("quiz-info");
+    if (quizInfo) quizInfo.textContent = currentListTitle;
 
     startSession();
 }
@@ -108,13 +154,14 @@ function chooseRandomMode() {
 // ==========================
 function renderChunkMenu() {
     const container = document.getElementById("list-chunks");
+    if (!container) return;
     container.innerHTML = "";
 
-    const totalChunks = Math.ceil(currentWordList.length / 100); // 1000語なら10ブロック
+    const totalChunks = Math.ceil(currentWordList.length / 100);
 
     for (let i = 0; i < totalChunks; i++) {
         const start = i * 100;
-        const end =  Math.min(start + 100, currentWordList.length);
+        const end = Math.min(start + 100, currentWordList.length);
         const card = document.createElement("div");
         card.className = "quiz-card";
         card.innerHTML = `<span class="quiz-title">${start + 1}〜${end}問目</span>`;
@@ -129,11 +176,13 @@ function renderChunkMenu() {
                 currentMode = "sequential";
                 sequentialIndex = start;
             } else {
-                currentMode = "randomChunk"; //範囲内ランダム
+                currentMode = "randomChunk";
             }
 
-            document.getElementById("quiz-info").textContent =
-                `${currentListTitle} ${start + 1}~${end}問目`
+            const quizInfo = document.getElementById("quiz-info");
+            if (quizInfo) {
+                quizInfo.textContent = `${currentListTitle} ${start + 1}~${end}問目`;
+            }
 
             startSession();
         };
@@ -141,17 +190,10 @@ function renderChunkMenu() {
     }
 }
 
-// 画面3→画面4に移動するとき、ブロック一覧を作ってから表示する
-// document.getElementById("screen-chunk") // 要素取得は残すが、実際の生成はshowScreen呼び出し前に必要
-// ↑ 画面3の「順番に出題」ボタンのonclickを少し変更する(下記参照)
-
 // ==========================
 // 問題を選ぶ処理
 // ==========================
-
-// ランダムモード用(今までと同じ)
 function pickRandomQuestion(){
-    // 出題済み以外を集める
     const remainingIndices = [];
     for (let i = 0; i < currentWordList.length; i++) {
         if (!askedIndices.includes(i)) {
@@ -159,16 +201,12 @@ function pickRandomQuestion(){
         }
     }
 
-    //候補がなくなれば終了
-    if (remainingIndices.length === 0) {
-        return null;
-    }
+    if (remainingIndices.length === 0) return null;
 
-    //残ったものの中からランダムに選ぶ
     const pickIndexInRemaining = Math.floor(Math.random() * remainingIndices.length);
     const correctIndex = remainingIndices[pickIndexInRemaining];
     const correctItem = currentWordList[correctIndex];
-    askedIndices.push(correctIndex);    //出題済みとして記録
+    askedIndices.push(correctIndex);
 
     const wrongChoices = [];
     while (wrongChoices.length < 2) {
@@ -181,9 +219,7 @@ function pickRandomQuestion(){
     return buildQuestion(correctItem, wrongChoices);
 }
 
-//範囲(chunkStart-End)の中からランダムに1問選ぶ
 function pickRandomChunkQuestion(){
-    //範囲内でまだ出してない番号だけ集める
     const remainingIndices = [];
     for (let i = chunkStart; i < chunkEnd; i++) {
         if (!askedIndices.includes(i)) {
@@ -191,9 +227,7 @@ function pickRandomChunkQuestion(){
         }
     }
     
-    if (remainingIndices.length === 0) {
-        return null; //範囲内を出し切った
-    }
+    if (remainingIndices.length === 0) return null;
 
     const pickIndexInRemaining = Math.floor(Math.random() * remainingIndices.length);
     const correctIndex = remainingIndices[pickIndexInRemaining];
@@ -212,11 +246,8 @@ function pickRandomChunkQuestion(){
     return buildQuestion(correctItem, wrongChoices);
 }
 
-// 順番モード用(1問ずつ順番に進める)
 function pickSequentialQuestion(){
-    if (sequentialIndex >= chunkEnd) {
-        return null;
-    }
+    if (sequentialIndex >= chunkEnd) return null;
 
     const correctItem = currentWordList[sequentialIndex];
     const correctIndex = sequentialIndex;
@@ -230,12 +261,10 @@ function pickSequentialQuestion(){
         }
     }
 
-    sequentialIndex++; // 次に呼ばれたときは次の単語に進む
-
+    sequentialIndex++;
     return buildQuestion(correctItem, wrongChoices);
 }
 
-// 正解＋ダミー2つから、選択肢オブジェクトを組み立てる共通処理
 function buildQuestion(correctItem, wrongChoices) {
     let choices = [
         correctItem.meaning,
@@ -262,19 +291,26 @@ function shuffle(array) {
 }
 
 // ==========================
-// 出題・表示処理
+// 音声読み上げ
 // ==========================
-let currentQuestion;
-
 function speakWord(word) {
+    if (appSettings.muted) return;
+    if (!('speechSynthesis' in window)) return;
+
+    window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(word);
     utterance.lang = "en-GB";
-    utterance.rate = 1;
+    utterance.rate = appSettings.rate;
+    utterance.volume = appSettings.volume;
     speechSynthesis.speak(utterance);
 }
 
+// ==========================
+// クイズの出題・表示処理
+// ==========================
+let currentQuestion;
+
 function showQuestion(){
-    // モードによって問題の選び方を切り替える
     if (currentMode === "random") {
         currentQuestion = pickRandomQuestion();
     } else if (currentMode === "randomChunk"){
@@ -283,46 +319,51 @@ function showQuestion(){
         currentQuestion = pickSequentialQuestion();
     }
 
-    //出題する問題がなければ終了画面を表示
     if (currentQuestion === null) {
         finishQuiz();
         return;
     }
 
-    document.getElementById("question-text").textContent = currentQuestion.word;
+    const questionText = document.getElementById("question-text");
+    if (questionText) questionText.textContent = currentQuestion.word;
     speakWord(currentQuestion.word);
 
     const buttons = document.querySelectorAll(".choice-btn");
     buttons.forEach((btn, i) => {
-        btn.querySelector(".choice-text").textContent = currentQuestion.choices[i];
+        const textSpan = btn.querySelector(".choice-text");
+        if (textSpan) textSpan.textContent = currentQuestion.choices[i];
         btn.classList.remove("correct", "incorrect");
     });
 
     const nextBtn = document.getElementById("next-btn");
-    nextBtn.classList.remove("active");
-    nextBtn.classList.add("disabled");
+    if (nextBtn) {
+        nextBtn.classList.remove("active");
+        nextBtn.classList.add("disabled");
+    }
 }
 
-//終了画面を表示
 function finishQuiz() {
-    document.getElementById("quiz-container").style.display = "none";
-    document.getElementById("quiz-complete").style.display = "block";
+    const quizContainer = document.getElementById("quiz-container");
+    const quizComplete = document.getElementById("quiz-complete");
+    if (quizContainer) quizContainer.style.display = "none";
+    if (quizComplete) quizComplete.style.display = "block";
 
     const total = askedIndices.length;
-    document.getElementById("complete-message").textContent =
-        `正答率 ${correctCount}/${total}問` ;
+    const completeMsg = document.getElementById("complete-message");
+    if (completeMsg) completeMsg.textContent = `正答率 ${correctCount}/${total}問`;
 
-    //間違えた問題一覧
     const wrongListContainer = document.getElementById("wrong-answers-list");
+    if (!wrongListContainer) return;
     wrongListContainer.innerHTML = "";
 
     if (wrongAnswers.length === 0) {
-        wrongListContainer.innerHTML = `<p style="color: #333;">全問正解です！</p>`;
+        wrongListContainer.innerHTML = `<p style="color: #333; padding: 20px; text-align: center;">全問正解です！お見事！</p>`;
     } else {
-        const heading = document.createElement("h3");
-        heading.textContent = "間違えた単語";
-        heading.className = "wrong-answers-heading"
+        const heading = document.createElement("div");
+        heading.textContent = "間違えた単語一覧";
+        heading.className = "wrong-answers-heading";
         wrongListContainer.appendChild(heading);
+
         wrongAnswers.forEach(item => {
             const row = document.createElement("div");
             row.className = "wrong-answer-item";
@@ -331,44 +372,49 @@ function finishQuiz() {
                 <span class="wrong-meaning">${item.meaning}</span>
             `;
             wrongListContainer.appendChild(row);
-        })
+        });
     }
 }
 
 const buttons = document.querySelectorAll(".choice-btn");
-
 buttons.forEach((btn, i) => {
     btn.addEventListener("click", () => {
-        //すでに答え終わっていたらそれ以上何もしない
-        if (document.getElementById("next-btn").classList.contains("active")) {
+        const nextBtn = document.getElementById("next-btn");
+        if (nextBtn && nextBtn.classList.contains("active")) {
             return;
         }
         
-        if (i === currentQuestion.answer){
+        if (currentQuestion && i === currentQuestion.answer){
             btn.classList.add("correct");
             correctCount++;
-        } else {
+        } else if (currentQuestion) {
             btn.classList.add("incorrect");
             buttons[currentQuestion.answer].classList.add("correct");
-            //間違えた単語と正解の意味を記録
             wrongAnswers.push({
                 word: currentQuestion.word,
                 meaning: currentQuestion.choices[currentQuestion.answer]
             });
         }
-        const nextBtn = document.getElementById("next-btn");
-        nextBtn.classList.remove("disabled");
-        nextBtn.classList.add("active");
+        if (nextBtn) {
+            nextBtn.classList.remove("disabled");
+            nextBtn.classList.add("active");
+        }
     });
 });
 
-document.getElementById("next-btn").addEventListener("click", () => {
-    showQuestion();
-});
+const nextBtnElem = document.getElementById("next-btn");
+if (nextBtnElem) {
+    nextBtnElem.addEventListener("click", () => {
+        showQuestion();
+    });
+}
 
-document.getElementById("speak-btn").addEventListener("click", () => {
-    speakWord(currentQuestion.word);
-});
+const speakBtnElem = document.getElementById("speak-btn");
+if (speakBtnElem) {
+    speakBtnElem.addEventListener("click", () => {
+        if (currentQuestion) speakWord(currentQuestion.word);
+    });
+}
 
 function retryQuiz() {
     askedIndices = [];
@@ -376,26 +422,29 @@ function retryQuiz() {
     wrongAnswers = [];
 
     if (currentMode === "sequential") {
-        sequentialIndex = chunkStart; //順番モードのときは、範囲の先頭に戻す
+        sequentialIndex = chunkStart;
     }
     
-    if (currentMode === "random") {
-        document.getElementById("quiz-info").textContent = currentListTitle;
-    } else {
-        document.getElementById("quiz-info").textContent = 
-            `${currentListTitle} ${chunkStart + 1}~${chunkEnd}問目`
+    const quizInfo = document.getElementById("quiz-info");
+    if (quizInfo) {
+        if (currentMode === "random") {
+            quizInfo.textContent = currentListTitle;
+        } else {
+            quizInfo.textContent = `${currentListTitle} ${chunkStart + 1}~${chunkEnd}問目`;
+        }
     }
     startSession();
 }
 
 // ==========================
-// 単語帳モード
+// 単語帳モード（タップ形式）
 // ==========================
 function showCard() {
-    document.getElementById("card-area").style.display = "block";
-    document.getElementById("card-complete").style.display = "none";
+    const cardArea = document.getElementById("card-area");
+    const cardComplete = document.getElementById("card-complete");
+    if (cardArea) cardArea.style.display = "block";
+    if (cardComplete) cardComplete.style.display = "none";
 
-    // 既存の出題ロジックを流用(正解の意味は choices[answer] で取れる)
     let q;
     if (currentMode === "random") q = pickRandomQuestion();
     else if (currentMode === "randomChunk") q = pickRandomChunkQuestion();
@@ -409,106 +458,57 @@ function showCard() {
     currentCard = { word: q.word, meaning: q.choices[q.answer] };
     cardRevealed = false;
 
-    document.getElementById("card-word").textContent = currentCard.word;
+    const cardWord = document.getElementById("card-word");
     const meaningEl = document.getElementById("card-meaning");
-    meaningEl.textContent = currentCard.meaning;
-    meaningEl.style.visibility = "hidden";
+    const hintEl = document.getElementById("card-hint");
+    const progressEl = document.getElementById("card-progress");
+
+    if (cardWord) cardWord.textContent = currentCard.word;
+    if (meaningEl) {
+        meaningEl.textContent = currentCard.meaning;
+        meaningEl.style.visibility = "hidden"; // 最初は意味を隠す
+    }
+    if (hintEl) hintEl.textContent = "👆 タップして意味を表示";
 
     const total = currentMode === "random"
         ? currentWordList.length
         : chunkEnd - chunkStart;
-    document.getElementById("card-progress").textContent =
-        `${askedIndices.length} / ${total}`;
+    if (progressEl) {
+        progressEl.textContent = `${askedIndices.length} / ${total}`;
+    }
 
     speakWord(currentCard.word);
 }
 
-function finishCards() {
-    document.getElementById("card-area").style.display = "none";
-    document.getElementById("card-complete").style.display = "block";
-}
+// カードがタップされたときの処理
+function onCardClicked() {
+    const meaningEl = document.getElementById("card-meaning");
+    const hintEl = document.getElementById("card-hint");
 
-// スワイプ後の処理：1回目は意味を表示、2回目は次の単語へ
-function onCardSwiped(dir) {
-    const card = document.getElementById("flashcard");
-    // 画面外へ飛ばす
-    card.style.transition = "transform 0.2s ease, opacity 0.2s ease";
-    card.style.transform = `translateX(${dir * 400}px) rotate(${dir * 20}deg)`;
-    card.style.opacity = "0";
-
-    setTimeout(() => {
-        // 一瞬で元の位置に戻す(アニメーションなし)
-        card.style.transition = "none";
-        card.style.transform = "";
-        card.style.opacity = "1";
-
-        if (!cardRevealed) {
-            cardRevealed = true;
-            document.getElementById("card-meaning").style.visibility = "visible";
-        } else {
-            showCard();
-        }
-    }, 200);
-}
-
-// ---- スワイプ検出(マウス・タッチ共通) ----
-(function setupSwipe() {
-    const card = document.getElementById("flashcard");
-    let startX = null;
-    let dragX = 0;
-
-    card.addEventListener("pointerdown", e => {
-        if (e.target.closest("button")) return;  // 🔊ボタンは除外
-        startX = e.clientX;
-        dragX = 0;
-        card.setPointerCapture(e.pointerId);
-        card.style.transition = "none";
-    });
-
-    card.addEventListener("pointermove", e => {
-        if (startX === null) return;
-        dragX = e.clientX - startX;
-        card.style.transform = `translateX(${dragX}px) rotate(${dragX / 20}deg)`;
-    });
-
-    function endDrag() {
-        if (startX === null) return;
-        startX = null;
-        if (Math.abs(dragX) > 60) {
-            onCardSwiped(dragX > 0 ? 1 : -1);
-        } else {
-            // スワイプが足りなければ元に戻す
-            card.style.transition = "transform 0.2s ease";
-            card.style.transform = "";
-        }
+    if (!cardRevealed) {
+        cardRevealed = true;
+        if (meaningEl) meaningEl.style.visibility = "visible";
+        if (hintEl) hintEl.textContent = "👆 もう一度タップして次の単語へ";
+    } else {
+        showCard();
     }
-    card.addEventListener("pointerup", endDrag);
-    card.addEventListener("pointercancel", endDrag);
-})();
+}
 
-// PC用：矢印キーでも操作できるように
-document.addEventListener("keydown", e => {
-    if (document.getElementById("screen-card").style.display === "none") return;
-    if (document.getElementById("card-area").style.display === "none") return;
-    if (e.key === "ArrowRight") onCardSwiped(1);
-    if (e.key === "ArrowLeft") onCardSwiped(-1);
-});
+function finishCards() {
+    const cardArea = document.getElementById("card-area");
+    const cardComplete = document.getElementById("card-complete");
+    if (cardArea) cardArea.style.display = "none";
+    if (cardComplete) cardComplete.style.display = "block";
+}
 
-document.getElementById("card-speak").addEventListener("click", () => {
-    if (currentCard) speakWord(currentCard.word);
-});
-
-// クイズ・単語帳プレイ中の「戻る」ボタンが押されたときの処理
+// クイズ・単語帳プレイ中の「戻る」ボタン
 function handleQuizBack() {
     if (currentMode === "random") {
-        // 全体ランダムから来た場合はモード選択へ
         showScreen('screen-mode');
     } else {
-        // 範囲選択（ランダム・順番）から来た場合は範囲選択画面へ
         showScreen('screen-chunk');
     }
 }
-
 
 // ==========================
 // 初期表示
