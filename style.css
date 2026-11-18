@@ -211,6 +211,15 @@ body {
     font-size: 16px;
     font-weight: bold;
     margin: 0 0 16px 0;
+    text-align: center;
+}
+
+#card-area{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 #flashcard {
@@ -218,17 +227,18 @@ body {
     color: #333;
     width: 340px;
     min-height: 260px;
-    padding: 40px 24px;
+    padding: 32px 24px;
     border-radius: 20px;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     gap: 16px;
     cursor: pointer; /* ポインターを指マークに */
     user-select: none;
     transition: transform 0.1s ease;
+    margin: 0 auto;
 }
 
 #flashcard:active {
@@ -239,6 +249,8 @@ body {
     display: flex;
     align-items: center;
     gap: 12px;
+    min-height: 40px;
+    margin-top: 16px;
 }
 
 #card-word {
@@ -253,6 +265,7 @@ body {
     cursor: pointer;
     padding: 4px 8px;
     border-radius: 8px;
+    flex-shrink: 0;
 }
 
 #card-speak:hover {
@@ -551,5 +564,11 @@ body {
     .back-link {
         font-size: 16px;
         padding: 10px 16px;
+    }
+
+    #flashcard{
+        width: 90vw;
+        max-width: 340px;
+        height: 280px;
     }
 }

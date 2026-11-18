@@ -488,7 +488,7 @@ function onCardClicked() {
     if (!cardRevealed) {
         cardRevealed = true;
         if (meaningEl) meaningEl.style.visibility = "visible";
-        if (hintEl) hintEl.textContent = "👆 もう一度タップして次の単語へ";
+        if (hintEl) hintEl.textContent = "ータップー";
     } else {
         showCard();
     }
