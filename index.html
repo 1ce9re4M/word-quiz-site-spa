@@ -52,158 +52,173 @@
         </div>
     </div>
 
-    <!--画面１：言語選択-->
-    <div id="screen-language" class="screen">
-        <div id="menu-container">
-            <h1>言語</h1>
-            <div id="list-language" class= "quiz-list"></div>
+    <!-- 左右分割の全体レイアウト -->
+    <div id="app-layout">
+        <!-- 左側の広告エリア -->
+        <div id="left-ad-container">
+            <!-- admax -->
+            <script src="https://adm.shinobi.jp/s/bc06b619eb9e13a08110a22d9c485007"></script>
+            <!-- admax -->
         </div>
-    </div>
 
-    <!-- 画面２：リスト選択 -->
-    <div id="screen-list" class="screen" style="display:none;">
-        <div id="menu-container">
-            <div class="header-row">
-                <a href="#" class="back-link" onclick="renderLanguageMenu(); return false;">戻る</a>
-                <h1 id="list-title">リスト選択</h1>
-            </div>
-            <p id="list-subtitle">ここに説明</p>
-            <div id="list-lists" class="quiz-list"></div>
-        </div>
-    </div>
+        <!-- メインコンテンツ全体 -->
+        <div id="main-content-wrapper">
 
-    <!-- 画面2.5：形式選択 -->
-    <div id="screen-format" class="screen" style="display:none;">
-        <div id="menu-container">
-            <div class="header-row">
-                <a href="#" class="back-link" onclick="showScreen('screen-list'); return false;">戻る</a>
-                <h1>形式を選択</h1>
-            </div>
-            <div class="quiz-list">
-                <div class="quiz-card" onclick="currentFormat = 'quiz'; showScreen('screen-mode')">
-                    <span class="quiz-title">3択クイズ</span>
-                    <span class="quiz-desc">選択肢から意味を選ぶ</span>
-                </div>
-                <div class="quiz-card" onclick="currentFormat = 'card'; showScreen('screen-mode')">
-                    <span class="quiz-title">単語帳</span>
-                    <span class="quiz-desc">タップで意味を確認・進行</span>
+            <!--画面１：言語選択-->
+            <div id="screen-language" class="screen">
+                <div id="menu-container">
+                    <h1>言語</h1>
+                    <div id="list-language" class= "quiz-list"></div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!--画面３：出題モード選択-->
-    <div id="screen-mode" class="screen" style="display:none;">
-        <div id="menu-container">
-            <div class="header-row">
-                <a href="#" class="back-link" onclick="showScreen('screen-format'); return false;">戻る</a>
-                <h1 id="mode-title">出題モード</h1>
-            </div>
-            <div class="quiz-list">
-                <div class="quiz-card" onclick="chooseRandomMode()">
-                    <span class="quiz-title">全体からランダム出題</span>
-                    <span class="quiz-desc">1000語からランダムに出題</span>
-                </div>
-                <div class="quiz-card" onclick="chunkSelectMode = 'random'; renderChunkMenu(); showScreen('screen-chunk')">
-                    <span class="quiz-title">範囲を選んでランダム</span>
-                    <span class="quiz-desc">100問区切りでランダム</span>
-                </div>
-                <div class="quiz-card" onclick="chunkSelectMode = 'sequential'; renderChunkMenu(); showScreen('screen-chunk')">
-                    <span class="quiz-title">100問ずつ</span>
+            <!-- 画面２：リスト選択 -->
+            <div id="screen-list" class="screen" style="display:none;">
+                <div id="menu-container">
+                    <div class="header-row">
+                        <a href="#" class="back-link" onclick="renderLanguageMenu(); return false;">戻る</a>
+                        <h1 id="list-title">リスト選択</h1>
+                    </div>
+                    <p id="list-subtitle">ここに説明</p>
+                    <div id="list-lists" class="quiz-list"></div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- 画面４：100問の範囲選択 -->
-    <div id="screen-chunk" class="screen" style="display:none;">
-        <div id="menu-container">
-            <div class="header-row">
-                <a href="#" class="back-link" onclick="showScreen('screen-mode'); return false;">戻る</a>
-                <h1>範囲を選択</h1>
-            </div>
-            <div id="list-chunks" class="quiz-list"></div>
-        </div>
-    </div>
-
-    <!-- 画面５：クイズ本体 -->
-    <div id="screen-quiz" class="screen" style="display:none;">
-        <div id="menu-container">
-            <div class="header-row">
-                <a href="#" class="back-link" onclick="handleQuizBack(); return false;">戻る</a>
-            </div>
-
-            <p id="quiz-info"></p>
-
-            <div id="quiz-container">
-                <div id="question-area">
-                    <h2 id="question-text">問題文がここに入る</h2>
-                    <button id="speak-btn">🔊</button>
-                </div>
-                <div id="choices">
-                    <button class="choice-btn"><span class="choice-number">1</span><span class="choice-text"></span></button>
-                    <button class="choice-btn"><span class="choice-number">2</span><span class="choice-text"></span></button>
-                    <button class="choice-btn"><span class="choice-number">3</span><span class="choice-text"></span></button>
-                </div>
-                <p id="result-text"></p>
-                <button id="next-btn" class="disabled">次へ</button>
-            </div>
-
-            <!-- 終了画面 -->
-            <div id="quiz-complete" style="display:none;">
-                <div class="quiz-container complete-box">
-                    <h2>お疲れさまでした！</h2>
-                    <p id="complete-message"></p>
-
-                    <div id="wrong-answers-list"></div>
-                    
-                    <div class="complete-buttons">
-                        <button class="complete-btn primary" onclick="retryQuiz()">もう一度</button>
-                        <button class="complete-btn" onclick="showScreen('screen-mode')">範囲選択へ</button>
-                        <button class="complete-btn" onclick="showScreen('screen-format')">形式選択へ</button>
-                        <button class="complete-btn" onclick="renderLanguageMenu()">言語選択へ</button>
+            <!-- 画面2.5：形式選択 -->
+            <div id="screen-format" class="screen" style="display:none;">
+                <div id="menu-container">
+                    <div class="header-row">
+                        <a href="#" class="back-link" onclick="showScreen('screen-list'); return false;">戻る</a>
+                        <h1>形式を選択</h1>
+                    </div>
+                    <div class="quiz-list">
+                        <div class="quiz-card" onclick="currentFormat = 'quiz'; showScreen('screen-mode')">
+                            <span class="quiz-title">3択クイズ</span>
+                            <span class="quiz-desc">選択肢から意味を選ぶ</span>
+                        </div>
+                        <div class="quiz-card" onclick="currentFormat = 'card'; showScreen('screen-mode')">
+                            <span class="quiz-title">単語帳</span>
+                            <span class="quiz-desc">タップで意味を確認・進行</span>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- 画面６：単語帳 -->
-    <div id="screen-card" class="screen" style="display:none;">
-        <div id="menu-container">
-            <div class="header-row">
-                <a href="#" class="back-link" onclick="handleQuizBack(); return false;">戻る</a>
-            </div>
-            <p id="card-info"></p>
-
-            <div id="card-area">
-                <!-- タップ専用に変更 -->
-                <div id="flashcard" onclick="onCardClicked()">
-                    <div id="card-word-row">
-                        <h2 id="card-word"></h2>
-                        <button id="card-speak" onclick="event.stopPropagation(); if(currentCard) speakWord(currentCard.word);">🔊</button>
+            <!--画面３：出題モード選択-->
+            <div id="screen-mode" class="screen" style="display:none;">
+                <div id="menu-container">
+                    <div class="header-row">
+                        <a href="#" class="back-link" onclick="showScreen('screen-format'); return false;">戻る</a>
+                        <h1 id="mode-title">出題モード</h1>
                     </div>
-                    <p id="card-meaning"></p>
-                    <p id="card-hint">ータップー</p>
+                    <div class="quiz-list">
+                        <div class="quiz-card" onclick="chooseRandomMode()">
+                            <span class="quiz-title">全体からランダム出題</span>
+                            <span class="quiz-desc">1000語からランダムに出題</span>
+                        </div>
+                        <div class="quiz-card" onclick="chunkSelectMode = 'random'; renderChunkMenu(); showScreen('screen-chunk')">
+                            <span class="quiz-title">範囲を選んでランダム</span>
+                            <span class="quiz-desc">100問区切りでランダム</span>
+                        </div>
+                        <div class="quiz-card" onclick="chunkSelectMode = 'sequential'; renderChunkMenu(); showScreen('screen-chunk')">
+                            <span class="quiz-title">100問ずつ</span>
+                        </div>
+                    </div>
                 </div>
-                <p id="card-progress"></p>
             </div>
 
-            <div id="card-complete" style="display:none;">
-                <div class="quiz-container complete-box">
-                    <h2>お疲れさまでした！</h2>
-                    <p style="color: #666; margin-bottom: 20px;">すべての単語を確認しました！</p>
-                    
-                    <div class="complete-buttons">
-                        <button class="complete-btn primary" onclick="retryQuiz()">もう一度</button>
-                        <button class="complete-btn" onclick="showScreen('screen-mode')">範囲選択へ</button>
-                        <button class="complete-btn" onclick="showScreen('screen-format')">形式選択へ</button>
-                        <button class="complete-btn" onclick="renderLanguageMenu()">言語選択へ</button>
-                    </div>                
+<!-- 画面４：100問の範囲選択 -->
+            <div id="screen-chunk" class="screen" style="display:none;">
+                <div id="menu-container">
+                    <div class="header-row">
+                        <a href="#" class="back-link" onclick="showScreen('screen-mode'); return false;">戻る</a>
+                        <h1>範囲を選択</h1>
+                    </div>
+                    <div id="list-chunks" class="quiz-list"></div>
                 </div>
             </div>
-        </div>
-    </div>
+
+            <!-- 画面５：クイズ本体 -->
+            <div id="screen-quiz" class="screen" style="display:none;">
+                <div id="menu-container">
+                    <div class="header-row">
+                        <a href="#" class="back-link" onclick="handleQuizBack(); return false;">戻る</a>
+                    </div>
+
+                    <p id="quiz-info"></p>
+
+                    <div id="quiz-container">
+                        <div id="question-area">
+                            <h2 id="question-text">問題文がここに入る</h2>
+                            <button id="speak-btn">🔊</button>
+                        </div>
+                        <div id="choices">
+                            <button class="choice-btn"><span class="choice-number">1</span><span class="choice-text"></span></button>
+                            <button class="choice-btn"><span class="choice-number">2</span><span class="choice-text"></span></button>
+                            <button class="choice-btn"><span class="choice-number">3</span><span class="choice-text"></span></button>
+                        </div>
+                        <p id="result-text"></p>
+                        <button id="next-btn" class="disabled">次へ</button>
+                    </div>
+
+                    <!-- 終了画面 -->
+                    <div id="quiz-complete" style="display:none;">
+                        <div class="quiz-container complete-box">
+                            <h2>お疲れさまでした！</h2>
+                            <p id="complete-message"></p>
+
+                            <div id="wrong-answers-list"></div>
+                            
+                            <div class="complete-buttons">
+                                <button class="complete-btn primary" onclick="retryQuiz()">もう一度</button>
+                                <button class="complete-btn" onclick="showScreen('screen-mode')">範囲選択へ</button>
+                                <button class="complete-btn" onclick="showScreen('screen-format')">形式選択へ</button>
+                                <button class="complete-btn" onclick="renderLanguageMenu()">言語選択へ</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 画面６：単語帳 -->
+            <div id="screen-card" class="screen" style="display:none;">
+                <div id="menu-container">
+                    <div class="header-row">
+                        <a href="#" class="back-link" onclick="handleQuizBack(); return false;">戻る</a>
+                    </div>
+                    <p id="card-info"></p>
+
+                    <div id="card-area">
+                        <!-- タップ専用に変更 -->
+                        <div id="flashcard" onclick="onCardClicked()">
+                            <div id="card-word-row">
+                                <h2 id="card-word"></h2>
+                                <button id="card-speak" onclick="event.stopPropagation(); if(currentCard) speakWord(currentCard.word);">🔊</button>
+                            </div>
+                            <p id="card-meaning"></p>
+                            <p id="card-hint">👆 タップして意味を表示</p>
+                        </div>
+                        <p id="card-progress"></p>
+                    </div>
+
+                    <div id="card-complete" style="display:none;">
+                        <div class="quiz-container complete-box">
+                            <h2>お疲れさまでした！</h2>
+                            <p style="color: #666; margin-bottom: 20px;">すべての単語を確認しました！</p>
+                            
+                            <div class="complete-buttons">
+                                <button class="complete-btn primary" onclick="retryQuiz()">もう一度</button>
+                                <button class="complete-btn" onclick="showScreen('screen-mode')">範囲選択へ</button>
+                                <button class="complete-btn" onclick="showScreen('screen-format')">形式選択へ</button>
+                                <button class="complete-btn" onclick="renderLanguageMenu()">言語選択へ</button>
+                            </div>                
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div> <!-- /main-content-wrapper -->
+    </div> <!-- /app-layout -->
 
     <!-- wordlistファイルを読み込む -->
     <script src="EN-Lists/wordlist-en-list1.js"></script>

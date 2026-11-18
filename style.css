@@ -204,6 +204,39 @@ body {
 }
 
 /* ==========================
+    左右の広告レイアウト用
+========================== */
+#app-layout {
+    display: flex;
+    width: 100%;
+    min-height: 100vh;
+    align-items: center;
+    justify-content: center;
+}
+
+#left-ad-container {
+    width: 160px;
+    min-height: 400px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    flex-shrink: 0;
+}
+
+#main-content-wrapper {
+    display: flex;
+    justify-content: center;
+    flex: 1;
+}
+
+@media (max-width: 850px) {
+    #left-ad-container {
+        display: none;
+    }
+}
+
+/* ==========================
     単語帳モード（タップ形式）
 ========================== */
 #card-info {
@@ -214,7 +247,7 @@ body {
     text-align: center;
 }
 
-#card-area{
+#card-area {
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -226,7 +259,7 @@ body {
     background: #fff;
     color: #333;
     width: 340px;
-    min-height: 260px;
+    height: 280px;
     padding: 32px 24px;
     border-radius: 20px;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
@@ -235,10 +268,11 @@ body {
     align-items: center;
     justify-content: space-between;
     gap: 16px;
-    cursor: pointer; /* ポインターを指マークに */
+    cursor: pointer;
     user-select: none;
     transition: transform 0.1s ease;
     margin: 0 auto;
+    overflow: hidden;
 }
 
 #flashcard:active {
@@ -248,14 +282,18 @@ body {
 #card-word-row {
     display: flex;
     align-items: center;
-    gap: 12px;
-    min-height: 40px;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    min-height: 48px;
     margin-top: 16px;
 }
 
 #card-word {
-    font-size: 32px;
+    font-size: 28px;
     margin: 0;
+    word-break: break-word;
+    line-height: 1.2;
 }
 
 #card-speak {
@@ -273,16 +311,20 @@ body {
 }
 
 #card-meaning {
-    font-size: 20px;
+    font-size: 18px;
     color: #555;
     margin: 0;
-    min-height: 28px;
+    height: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.4;
 }
 
 #card-hint {
     font-size: 13px;
     color: #aaa;
-    margin: 8px 0 0 0;
+    margin: 0;
 }
 
 #card-progress {
@@ -290,13 +332,6 @@ body {
     text-align: center;
     margin-top: 20px;
     font-weight: bold;
-}
-
-@media (max-width: 600px) {
-    #flashcard {
-        width: 100%;
-        max-width: 340px;
-    }
 }
 
 /* クイズ画面用 */
@@ -472,7 +507,7 @@ body {
     color: #555;
     font-size: 14px;
     margin: 0 0 8px 4px;
-    text-align: left;
+    text-align: center;
     width: 100%;
 }
 
@@ -566,7 +601,7 @@ body {
         padding: 10px 16px;
     }
 
-    #flashcard{
+    #flashcard {
         width: 90vw;
         max-width: 340px;
         height: 280px;
