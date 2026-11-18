@@ -216,7 +216,7 @@ body {
 
 #left-ad-container {
     width: 160px;
-    min-height: 400px;
+    min-height: 600px;
     display: flex;
     justify-content: center;
     align-items: center;
